@@ -1,0 +1,53 @@
+{
+  "name": "tsapp-desktop",
+  "version": "1.0.0",
+  "description": "TSApp Desktop Application",
+  "main": "main.js",
+  "homepage": "./",
+  "dependencies": {
+    "electron-squirrel-startup": "^1.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "socket.io-client": "^4.5.4",
+    "axios": "^1.3.0"
+  },
+  "devDependencies": {
+    "electron": "^latest",
+    "electron-builder": "^latest",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "typescript": "^4.9.4"
+  },
+  "scripts": {
+    "react-start": "cross-env BROWSER=none PORT=3000 react-scripts start",
+    "react-build": "react-scripts build",
+    "electron-start": "wait-on http://localhost:3000 && electron .",
+    "start": "concurrently \"npm run react-start\" \"wait-on http://localhost:3000 && npm run electron-start\"",
+    "build": "npm run react-build && electron-builder",
+    "build-linux": "npm run react-build && electron-builder --linux",
+    "build-mac": "npm run react-build && electron-builder --mac",
+    "build-win": "npm run react-build && electron-builder --win"
+  },
+  "build": {
+    "appId": "com.tsapp.messenger",
+    "productName": "TSApp",
+    "files": [
+      "build/**/*",
+      "node_modules/**/*",
+      "main.js",
+      "preload.js"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "linux": {
+      "target": ["AppImage", "deb"]
+    },
+    "win": {
+      "target": ["nsis", "portable"]
+    },
+    "mac": {
+      "target": ["dmg", "zip"]
+    }
+  }
+}
