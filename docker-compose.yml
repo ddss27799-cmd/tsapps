@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:5.0
+    container_name: tsapp-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: tsapp
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - tsapp-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: tsapp-backend
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      NODE_ENV: development
+      MONGODB_URI: mongodb://mongodb:27017/tsapp
+      JWT_SECRET: your_super_secret_jwt_key
+      CORS_ORIGIN: http://localhost:5173
+    depends_on:
+      - mongodb
+    volumes:
+      - ./backend/src:/app/src
+    networks:
+      - tsapp-network
+    command: npm run dev
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: tsapp-web
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:3000
+    depends_on:
+      - backend
+    networks:
+      - tsapp-network
+    command: npm run dev
+
+  website:
+    build:
+      context: ./website
+      dockerfile: Dockerfile
+    container_name: tsapp-website
+    ports:
+      - "5174:5173"
+    networks:
+      - tsapp-network
+    command: npm run dev
+
+volumes:
+  mongodb_data:
+
+networks:
+  tsapp-network:
+    driver: bridge
